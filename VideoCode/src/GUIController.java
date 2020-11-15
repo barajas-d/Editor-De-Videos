@@ -6,6 +6,7 @@
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
+import javafx.scene.control.Slider;
 import javafx.scene.input.MouseEvent;
 
 public class GUIController {
@@ -17,6 +18,9 @@ public class GUIController {
     private URL location;
 
     @FXML
+    private Slider navBarVolume;
+    
+    @FXML
     void addPicture(MouseEvent event) {
         System.out.println("subir imagen");
     }
@@ -27,8 +31,11 @@ public class GUIController {
     }
 
     @FXML
-    void addVideo(MouseEvent event) {
-        System.out.println("subir video");
+    void addVideo(MouseEvent event){
+        //System.out.println("subir video");
+        //this.navBarVolume.setMin(0);
+        //this.navBarVolume.setMax(1);
+        //this.navBarVolume.setValue(1);
     }
 
     @FXML
@@ -44,6 +51,7 @@ public class GUIController {
     @FXML
     void muteClick(MouseEvent event) {
         System.out.println("mute");
+        //this.navBarVolume.setValue(0);
     }
 
     @FXML
