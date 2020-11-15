@@ -3,11 +3,13 @@
  * Sample Skeleton for 'GUI.fxml' Controller Class
  */
 
+import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.scene.control.Slider;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.FileChooser;
 
 public class GUIController {
 
@@ -32,6 +34,21 @@ public class GUIController {
 
     @FXML
     void addVideo(MouseEvent event){
+        
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Seleccionar Vídeo");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("*.mp4", "*.mkv"));
+        String url = "";
+        File file = fileChooser.showOpenDialog(null);
+        if (file != null) {
+            System.out.println(file.getPath());
+            String rutaVideo = file.getPath();
+            url = "file://" + file.getPath();
+        } else {
+            System.out.println(url);
+        }
+        
         //System.out.println("subir video");
         //this.navBarVolume.setMin(0);
         //this.navBarVolume.setMax(1);
