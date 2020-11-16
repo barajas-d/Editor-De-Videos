@@ -14,7 +14,7 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.scene.media.MediaPlayer.Status;
 import javafx.stage.FileChooser;
-import java.time.Duration;
+//import java.time.Duration;
 
 public class GUIController {
 
@@ -33,13 +33,9 @@ public class GUIController {
     @FXML
     private MediaView mediaView;
 
-
-
     Media media;
     MediaPlayer mediaPlayer;
     boolean isPlaying = false;
-
-    private Number value;
 
     @FXML
     void addPicture(MouseEvent event) {
@@ -74,18 +70,17 @@ public class GUIController {
         mediaPlayer = new MediaPlayer(media);
         mediaView.setMediaPlayer(mediaPlayer);
 
-        mediaPlayer.setOnReady( () -> {
-            reproductionTime.setMin(0);
-            reproductionTime.setMax(mediaPlayer.getTotalDuration().toSeconds());
-            reproductionTime.setValue(0);
+        reproductionTime.setMin(0);
+        reproductionTime.setMax(mediaPlayer.getTotalDuration().toSeconds());
+        reproductionTime.setValue(0);
+        /*
+         * reproductionTime.valueProperty().addListener( (paramet, observer, value) ->
+         * {​​​​ //GUIController.this.value = value; reproductionTime.setValue((double)
+         * GUIController.this.value); }​​​ );
+         */
+        mediaPlayer.setOnReady(() -> {
             mediaPlayer.play();
         });
-        reproductionTime.valueProperty().addListener(
-            (paramet, observer, value) -> {​​​​
-                //GUIController.this.value = value;
-                reproductionTime.setValue((double) GUIController.this.value);
-            }​​​
-        );
         this.isPlaying = true;
 
         navBarVolume.setMin(0);
@@ -115,24 +110,20 @@ public class GUIController {
     void playClick(MouseEvent event) {
         Status status = this.mediaPlayer.getStatus();
 
-        if (status == Status.UNKNOWN || status == Status.HALTED)
-        {
+        if (status == Status.UNKNOWN || status == Status.HALTED) {
             // don't do anything in these states
             return;
         }
 
-        if (status == Status.PAUSED || status == Status.READY || status == Status.STOPPED)
-        {
+        if (status == Status.PAUSED || status == Status.READY || status == Status.STOPPED) {
             // rewind the movie if we're sitting at the end
-            if (!this.isPlaying) 
-            {
+            if (!this.isPlaying) {
                 this.mediaPlayer.seek(this.mediaPlayer.getStartTime());
                 this.isPlaying = true;
             }
             System.out.println("play");
             this.mediaPlayer.play();
-        } else 
-        {
+        } else {
             System.out.println("pause");
             this.mediaPlayer.pause();
         }
