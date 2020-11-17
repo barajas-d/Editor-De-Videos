@@ -80,12 +80,6 @@ public class GUIController {
             reproductionTime.setValue(0);
             mediaPlayer.play();
         });
-        reproductionTime.valueProperty().addListener(
-            (paramet, observer, value) -> {​​​​
-                //GUIController.this.value = value;
-                reproductionTime.setValue((double) GUIController.this.value);
-            }​​​
-        );
         this.isPlaying = true;
 
         navBarVolume.setMin(0);
