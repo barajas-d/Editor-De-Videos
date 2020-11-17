@@ -6,7 +6,10 @@
 import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.media.Media;
@@ -14,7 +17,7 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.scene.media.MediaPlayer.Status;
 import javafx.stage.FileChooser;
-import java.time.Duration;
+import javafx.util.Duration;
 
 public class GUIController {
 
@@ -33,16 +36,18 @@ public class GUIController {
     @FXML
     private MediaView mediaView;
 
-
+    @FXML
+    private Label timeLabel;
 
     Media media;
     MediaPlayer mediaPlayer;
     boolean isPlaying = false;
 
     private Number value;
-
+            
     @FXML
     void addPicture(MouseEvent event) {
+        reproductionTime.setValue(0.5);
         System.out.println("subir imagen");
     }
 
@@ -63,8 +68,9 @@ public class GUIController {
         if (file != null) {
             System.out.println(file.getPath());
             String rutaVideo = file.getPath();
+            
             urlVideo = "file:///" + file.getPath();
-            urlVideo = "file:///D:/videoTest.mp4";
+            urlVideo = "file:///C:/videoTest.mp4";
             System.out.println("subir video " + rutaVideo);
 
         } else {
@@ -74,10 +80,30 @@ public class GUIController {
         mediaPlayer = new MediaPlayer(media);
         mediaView.setMediaPlayer(mediaPlayer);
 
+        
+        reproductionTime.setMin(0);
+        reproductionTime.setMax(1);
+        reproductionTime.setValue(0); 
+        
+        reproductionTime.valueProperty().addListener(new InvalidationListener() {
+            public void invalidated(Observable ov) {
+                if (reproductionTime.isValueChanging()) {
+                    mediaPlayer.seek(Duration.seconds(reproductionTime.getValue() * mediaPlayer.getTotalDuration().toSeconds()));
+                }
+            }
+        });        
+
+        
+        mediaPlayer.currentTimeProperty().addListener((a, b, value) -> {
+            reproductionTime.setValue(value.toSeconds()/mediaPlayer.getTotalDuration().toSeconds());
+
+            double minutoActual = (int)value.toMinutes();
+            double segundoActual = (int)value.toSeconds() % 60;
+            timeLabel.setText(String.format("%.0f", minutoActual) + "." + String.format("%.0f", segundoActual) + "Mins");
+        });
+        
+        
         mediaPlayer.setOnReady( () -> {
-            reproductionTime.setMin(0);
-            reproductionTime.setMax(mediaPlayer.getTotalDuration().toSeconds());
-            reproductionTime.setValue(0);
             mediaPlayer.play();
         });
         this.isPlaying = true;
@@ -97,12 +123,21 @@ public class GUIController {
     @FXML
     void avanzarClick(MouseEvent event) {
         System.out.println("avanzar");
+        double tiempoTotal = mediaPlayer.getTotalDuration().toSeconds();
+        double tiempoActual = reproductionTime.getValue() * tiempoTotal;
+        if(tiempoActual < tiempoTotal - 0.25){
+            tiempoActual = tiempoActual + 0.25;
+        }
+        else{
+            tiempoActual = tiempoTotal;
+        }
+        mediaPlayer.seek(Duration.seconds(tiempoActual));
     }
 
     @FXML
     void muteClick(MouseEvent event) {
         System.out.println("mute");
-        // this.navBarVolume.setValue(0);
+        navBarVolume.setValue(0);
     }
 
     @FXML
@@ -135,6 +170,15 @@ public class GUIController {
     @FXML
     void retrocederClick(MouseEvent event) {
         System.out.println("retroceder");
+        double tiempoTotal = mediaPlayer.getTotalDuration().toSeconds();
+        double tiempoActual = reproductionTime.getValue() * tiempoTotal;
+        if(tiempoActual > 0.25){
+            tiempoActual = tiempoActual - 0.25;
+        }
+        else{
+            tiempoActual = 0;
+        }
+        mediaPlayer.seek(Duration.seconds(tiempoActual));
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
