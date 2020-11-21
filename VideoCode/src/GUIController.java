@@ -24,6 +24,7 @@ import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
 
+
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -53,7 +54,6 @@ public class GUIController {
     Media media;
     MediaPlayer mediaPlayer;
     boolean isPlaying = false;
-
     private Number value;
     
     @FXML
@@ -134,7 +134,6 @@ public class GUIController {
         media = new Media(urlVideo);
         mediaPlayer = new MediaPlayer(media);
         mediaView.setMediaPlayer(mediaPlayer);
-
         
         reproductionTime.setMin(0);
         reproductionTime.setMax(1);
@@ -198,24 +197,20 @@ public class GUIController {
     void playClick(MouseEvent event) {
         Status status = this.mediaPlayer.getStatus();
 
-        if (status == Status.UNKNOWN || status == Status.HALTED)
-        {
+        if (status == Status.UNKNOWN || status == Status.HALTED) {
             // don't do anything in these states
             return;
         }
 
-        if (status == Status.PAUSED || status == Status.READY || status == Status.STOPPED)
-        {
+        if (status == Status.PAUSED || status == Status.READY || status == Status.STOPPED) {
             // rewind the movie if we're sitting at the end
-            if (!this.isPlaying) 
-            {
+            if (!this.isPlaying) {
                 this.mediaPlayer.seek(this.mediaPlayer.getStartTime());
                 this.isPlaying = true;
             }
             System.out.println("play");
             this.mediaPlayer.play();
-        } else 
-        {
+        } else {
             System.out.println("pause");
             this.mediaPlayer.pause();
         }

@@ -17,6 +17,7 @@ public class App extends Application {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("GUI.fxml"));
         Parent root = loader.load();
+        System.out.println("cout");
         
         Scene scene = new Scene(root);
         String style = App.class.getResource("style.css").toExternalForm();
