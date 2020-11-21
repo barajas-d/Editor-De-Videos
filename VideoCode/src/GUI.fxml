@@ -115,7 +115,7 @@
                </font>
             </Text>
             <Slider id="reproductionTime" fx:id="reproductionTime" layoutX="133.0" layoutY="719.0" prefHeight="14.0" prefWidth="614.0" />
-            <Label layoutX="82.0" layoutY="718.0" text="Time" />
+            <Label fx:id="timeLabel" layoutX="82.0" layoutY="718.0" text="Time" />
             <StackPane id="mediaViewPane" fx:id="mediaViewPane" layoutX="40.0" layoutY="110.0" prefHeight="600.0" prefWidth="800.0">
                <children>
                   <MediaView id="mediaView" fx:id="mediaView" fitHeight="${mediaViewPane.height}" fitWidth="${mediaViewPane.width}" focusTraversable="true" />
