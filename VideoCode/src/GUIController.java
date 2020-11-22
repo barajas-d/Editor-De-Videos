@@ -4,7 +4,6 @@
  */
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -13,7 +12,6 @@ import javafx.beans.Observable;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
@@ -27,7 +25,6 @@ import javafx.util.Duration;
 
 import jaco.mp3.player.MP3Player;
 
-import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -58,7 +55,6 @@ public class GUIController {
     Media media;
     MediaPlayer mediaPlayer;
     boolean isPlaying = false;
-    private Number value;
     
     @FXML
     private StackPane mediaViewPane;
@@ -78,7 +74,11 @@ public class GUIController {
             System.out.println(file.getPath());
             url = "file://" + file.getPath();
         }
-        else return;
+        else
+        {
+            System.out.println("eoror addPucture " + url);
+            return;
+        } 
         
         ImageView image = new ImageView(file.toURI().toString());
         image.setFitHeight(600);
@@ -107,10 +107,6 @@ public class GUIController {
             System.out.println(file.getPath());
             url = file.getPath();
         } else return;
-        
-        FileInputStream fileInputStream = new FileInputStream(url);
-        //Player playMP3 = new Player(fileInputStream);
-        //playMP3.play();
         
         
         String substring=url.substring(url.length()-3, url.length());
