@@ -4,6 +4,7 @@
  */
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -24,6 +25,7 @@ import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
 
+import jaco.mp3.player.MP3Player;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -31,6 +33,8 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
+
+
 public class GUIController {
 
     @FXML // ResourceBundle that was given to the FXMLLoader
@@ -99,19 +103,34 @@ public class GUIController {
             url = file.getPath();
         } else return;
         
-        // Se obtiene un Clip de sonido
-        Clip sonido = AudioSystem.getClip();
-            
-        // Se carga con un fichero wav
-        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);
-        sonido.open(audioInputStream);    
+        FileInputStream fileInputStream = new FileInputStream(url);
+        //Player playMP3 = new Player(fileInputStream);
+        //playMP3.play();
+        
+        
+        String substring=url.substring(url.length()-3, url.length());
+        System.out.println("Sub:"+substring);
+        if(substring.equals("wav")){
+            Clip sonido = AudioSystem.getClip();
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);
+            sonido.open(audioInputStream);    
+            //mediaPlayer.setVolume(0);
+            mediaPlayer.setMute(true);
+            sonido.start();
+        }
+        else if(substring.equals("mp3")){
+            MP3Player mp3 = new MP3Player(file);
+            //mediaPlayer.setVolume(0);
+            mediaPlayer.setMute(true);
+            mp3.play();
+        }
         
         //AudioFileFormat audioFileFormat = AudioSystem.getAudioFileFormat(file);
         
         //for( :audioInputStream )
 
         // Comienza la reproducción
-        sonido.start();
+        
     }
 
     @FXML
