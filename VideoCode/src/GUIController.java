@@ -60,7 +60,6 @@ public class GUIController {
 
     @FXML
     private Label timeLabel;
-
     
     @FXML
     private StackPane mediaViewPane;
@@ -73,7 +72,10 @@ public class GUIController {
     Rectangle cuadrado;
     double muteVolumenOld;
     boolean muted = false;
-
+    boolean imageIn = false;
+    boolean videoIn = false;
+    boolean soundIn = false;
+    
     List<ImagePosition> imagePosition = new ArrayList<>();
     
     public void addImagePosition(ImagePosition newPosition){
@@ -115,28 +117,32 @@ public class GUIController {
  
     @FXML
     void addPicture(MouseEvent event) {
-        reproductionTime.setValue(0.5);
-        System.out.println("subir imagen");
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Seleccionar Imagen");
-        fileChooser.getExtensionFilters()
-                .addAll(new FileChooser.ExtensionFilter("Imagen (*.png, *.jpg, *.gif)", "*.png", "*.jpg", "*.gif"));
-        String urlImagen = "";
+        if(!imageIn){
+            reproductionTime.setValue(0.5);
+            System.out.println("subir imagen");
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Seleccionar Imagen");
+            fileChooser.getExtensionFilters()
+                    .addAll(new FileChooser.ExtensionFilter("Imagen (*.png, *.jpg, *.gif)", "*.png", "*.jpg", "*.gif"));
+            String urlImagen = "";
 
-        File file = fileChooser.showOpenDialog(null);
+            File file = fileChooser.showOpenDialog(null);
 
-        if (file != null) {
-            System.out.println(file.getPath());
-            String filePath = file.getPath().replace("\\", "/");
-            urlImagen = new String("file:///" + filePath);
+            if (file != null) {
+                System.out.println(file.getPath());
+                String filePath = file.getPath().replace("\\", "/");
+                urlImagen = new String("file:///" + filePath);
 
-        } else {
-            System.out.println("eoror addPucture " + urlImagen);
-            return;
+            } else {
+                System.out.println("eoror addPucture " + urlImagen);
+                return;
+            }
+
+            cuadrado = crearCuadrado(urlImagen);
+            mediaViewPane.getChildren().add(cuadrado);
+            
+            imageIn = true;
         }
-
-        cuadrado = crearCuadrado(urlImagen);
-        mediaViewPane.getChildren().add(cuadrado);
     }
 
     private Rectangle crearCuadrado(String url) {
@@ -154,52 +160,54 @@ public class GUIController {
 
     @FXML
     void addSound(MouseEvent event) throws LineUnavailableException, UnsupportedAudioFileException, IOException {
-        System.out.println("subir audido");
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Seleccionar Audio");
-        fileChooser.getExtensionFilters()
-                .addAll(new FileChooser.ExtensionFilter("Sonido (*.mp3, *.wav)", "*.mp3", "*.aac"));
+        if(!soundIn){
+            System.out.println("subir audido");
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Seleccionar Audio");
+            fileChooser.getExtensionFilters()
+                    .addAll(new FileChooser.ExtensionFilter("Sonido (*.mp3, *.wav)", "*.mp3", "*.aac"));
 
-        String url = "";
-        File file = fileChooser.showOpenDialog(null);
-        if (file != null) {
-            System.out.println(file.getPath());
-            url = file.getPath();
-        } else
-            return;
+            String url = "";
+            File file = fileChooser.showOpenDialog(null);
+            if (file != null) {
+                System.out.println(file.getPath());
+                url = file.getPath();
+            } else
+                return;
 
-        String substring = url.substring(url.length() - 3, url.length());
-        System.out.println("Sub:" + substring);
-        if (substring.equals("wav")) {
-            Clip sonido = AudioSystem.getClip();
-            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);
-            sonido.open(audioInputStream);
-            // mediaPlayer.setVolume(0);
-            
-            mediaPlayer.setMute(true);
-            
-             navBarVolume.valueProperty().addListener(new InvalidationListener() {
-                public void invalidated(Observable ov) {
-                    System.out.println("Volumen Wav: " + navBarVolume.getValue());
-                }
-            });
-            
-            sonido.start();
-            
-        } else if (substring.equals("mp3")) {
-            MP3Player mp3 = new MP3Player(file);
-            // mediaPlayer.setVolume(0);
-            mediaPlayer.setMute(true);
-            
-            navBarVolume.valueProperty().addListener(new InvalidationListener() {
-                public void invalidated(Observable ov) {
-                    System.out.println("Volumen MP3: " + navBarVolume.getValue());
-                }
-            });
-            
-            mp3.play();
+            String substring = url.substring(url.length() - 3, url.length());
+            System.out.println("Sub:" + substring);
+            if (substring.equals("wav")) {
+                Clip sonido = AudioSystem.getClip();
+                AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);
+                sonido.open(audioInputStream);
+                // mediaPlayer.setVolume(0);
+
+                mediaPlayer.setMute(true);
+
+                 navBarVolume.valueProperty().addListener(new InvalidationListener() {
+                    public void invalidated(Observable ov) {
+                        System.out.println("Volumen Wav: " + navBarVolume.getValue());
+                    }
+                });
+
+                sonido.start();
+
+            } else if (substring.equals("mp3")) {
+                MP3Player mp3 = new MP3Player(file);
+                // mediaPlayer.setVolume(0);
+                mediaPlayer.setMute(true);
+
+                navBarVolume.valueProperty().addListener(new InvalidationListener() {
+                    public void invalidated(Observable ov) {
+                        System.out.println("Volumen MP3: " + navBarVolume.getValue());
+                    }
+                });
+
+                mp3.play();
+            }
+            soundIn = true;
         }
-
         // AudioFileFormat audioFileFormat = AudioSystem.getAudioFileFormat(file);
 
         // for( :audioInputStream )
@@ -211,65 +219,71 @@ public class GUIController {
     @FXML
     void addVideo(MouseEvent event) {
 
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Seleccionar Vídeo");
-        fileChooser.getExtensionFilters()
-                .addAll(new FileChooser.ExtensionFilter("Vídeo (*.mp4, *.mov)", "*.mp4", "*.mov"));
-        String urlVideo = "";
-        File file = fileChooser.showOpenDialog(null);
-        if (file != null) {
-            String filePath = file.getPath().replace("\\", "/");
-            urlVideo = new String("file:///" + filePath);
-            // urlVideo = "file:///C:/videoTest.mp4";
-            System.out.println("subir video " + urlVideo);
-        } else {
-            System.out.println("Error URL Video");
-        }
-        media = new Media(urlVideo);
-        mediaPlayer = new MediaPlayer(media);
-        mediaView.setMediaPlayer(mediaPlayer);
-
-        reproductionTime.setMin(0);
-        reproductionTime.setMax(1);
-        reproductionTime.setValue(0);
-
-        reproductionTime.valueProperty().addListener(new InvalidationListener() {
-            public void invalidated(Observable ov) {
-                if (reproductionTime.isValueChanging()) {
-                    mediaPlayer.seek(
-                            Duration.seconds(reproductionTime.getValue() * mediaPlayer.getTotalDuration().toSeconds()));
-                }
-            }
+        if(!videoIn){
             
-        });
-
-        mediaPlayer.currentTimeProperty().addListener((a, b, value) -> {
-            reproductionTime.setValue(value.toSeconds() / mediaPlayer.getTotalDuration().toSeconds());
-
-            double minutoActual = (int) value.toMinutes();
-            double segundoActual = (int) value.toSeconds() % 60;
-            timeLabel.setText(String.format("%.0f", minutoActual) + "." + String.format("%.0f", segundoActual) + "Mins");
-            //System.out.println("ImageX: " + cuadrado.getTranslateX() + " ImageY: " + cuadrado.getTranslateY());
         
-            double actualTime = Math.round(reproductionTime.getValue()*mediaPlayer.getTotalDuration().toSeconds() * 10d) / 10d;
-            ImagePosition actualPosition = getImagePosicion(actualTime); 
-            if(actualPosition != null){
-                System.out.println("conincidencia");
-                cuadrado.setTranslateX(actualPosition.getPosx());
-                cuadrado.setTranslateY(actualPosition.getPosy());
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Seleccionar Vídeo");
+            fileChooser.getExtensionFilters()
+                    .addAll(new FileChooser.ExtensionFilter("Vídeo (*.mp4, *.mov)", "*.mp4", "*.mov"));
+            String urlVideo = "";
+            File file = fileChooser.showOpenDialog(null);
+            if (file != null) {
+                String filePath = file.getPath().replace("\\", "/");
+                urlVideo = new String("file:///" + filePath);
+                // urlVideo = "file:///C:/videoTest.mp4";
+                System.out.println("subir video " + urlVideo);
+            } else {
+                System.out.println("Error URL Video");
             }
-            
-        });
+            media = new Media(urlVideo);
+            mediaPlayer = new MediaPlayer(media);
+            mediaView.setMediaPlayer(mediaPlayer);
 
-        mediaPlayer.setOnReady(() -> {
-            mediaPlayer.play();
-        });
-        this.isPlaying = true;
+            reproductionTime.setMin(0);
+            reproductionTime.setMax(1);
+            reproductionTime.setValue(0);
 
-        navBarVolume.setMin(0);
-        navBarVolume.setMax(1);
-        navBarVolume.setValue(1);
-        mediaPlayer.volumeProperty().bind(navBarVolume.valueProperty());
+            reproductionTime.valueProperty().addListener(new InvalidationListener() {
+                public void invalidated(Observable ov) {
+                    if (reproductionTime.isValueChanging()) {
+                        mediaPlayer.seek(
+                                Duration.seconds(reproductionTime.getValue() * mediaPlayer.getTotalDuration().toSeconds()));
+                    }
+                }
+
+            });
+
+            mediaPlayer.currentTimeProperty().addListener((a, b, value) -> {
+                reproductionTime.setValue(value.toSeconds() / mediaPlayer.getTotalDuration().toSeconds());
+
+                double minutoActual = (int) value.toMinutes();
+                double segundoActual = (int) value.toSeconds() % 60;
+                timeLabel.setText(String.format("%.0f", minutoActual) + "." + String.format("%.0f", segundoActual) + "Mins");
+                //System.out.println("ImageX: " + cuadrado.getTranslateX() + " ImageY: " + cuadrado.getTranslateY());
+
+                double actualTime = Math.round(reproductionTime.getValue()*mediaPlayer.getTotalDuration().toSeconds() * 10d) / 10d;
+                ImagePosition actualPosition = getImagePosicion(actualTime); 
+                if(actualPosition != null){
+                    System.out.println("conincidencia");
+                    cuadrado.setTranslateX(actualPosition.getPosx());
+                    cuadrado.setTranslateY(actualPosition.getPosy());
+                }
+
+            });
+
+            mediaPlayer.setOnReady(() -> {
+                mediaPlayer.play();
+            });
+            this.isPlaying = true;
+
+            navBarVolume.setMin(0);
+            navBarVolume.setMax(1);
+            navBarVolume.setValue(1);
+            mediaPlayer.volumeProperty().bind(navBarVolume.valueProperty());
+        
+            videoIn = true;
+        } 
     }
 
     @FXML
