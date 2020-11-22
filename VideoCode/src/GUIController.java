@@ -3,6 +3,7 @@
  * Sample Skeleton for 'GUI.fxml' Controller Class
  */
 
+import Model.ImagePosition;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -29,6 +30,9 @@ import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
 import jaco.mp3.player.MP3Player;
+import static java.lang.Math.random;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -67,7 +71,45 @@ public class GUIController {
     double orgTranslateX, orgTranslateY;
     Rectangle cuadrado;
 
+    List<ImagePosition> imagePosition = new ArrayList<>();
+    
+    public void addImagePosition(ImagePosition newPosition){
+        //System.out.println("new: " + newItem + " old: " + imagePosition);
+        int index = 0;
+        Boolean insert = false;
+        for (ImagePosition actualItem : imagePosition) {
+            if(newPosition.getTimePercent() == actualItem.getTimePercent()){
+                insert = true;
+                break;
+            }
+            
+            if(newPosition.getTimePercent() < actualItem.getTimePercent() && !insert){
+                System.out.println("agrego" + newPosition.getTimePercent());
+                imagePosition.add(index, newPosition);
+                insert = true;
+                break;
+            }
+            index++;
+        }
+        
+        if(!insert){
+            imagePosition.add(newPosition);
+        }
+        
+        for (ImagePosition imagePosition1 : imagePosition) {
+            System.out.println("pos: " + imagePosition1.getTimePercent() + " x: " + imagePosition1.getPosx() + " Y: " + imagePosition1.getPosy());
+        }
+    }
 
+    public ImagePosition getImagePosicion(double time){
+        for (ImagePosition imagePosition1 : imagePosition) {
+            if(imagePosition1.getTimePercent() == time){
+                return imagePosition1;
+            }
+        }
+        return null;
+    }
+ 
     @FXML
     void addPicture(MouseEvent event) {
         reproductionTime.setValue(0.5);
@@ -90,12 +132,12 @@ public class GUIController {
             return;
         }
 
-        Rectangle cuadrado = crearCuadrado(urlImagen);
+        cuadrado = crearCuadrado(urlImagen);
         mediaViewPane.getChildren().add(cuadrado);
     }
 
     private Rectangle crearCuadrado(String url) {
-        Rectangle cuadrado = new Rectangle(200, 200);
+        cuadrado = new Rectangle(150, 150);
         System.out.println("url " + url);
         cuadrado.setFill(new ImagePattern(new Image(url)));
         cuadrado.setOnMouseDragged(squareOnMouseDraggedEventHandler);
@@ -179,6 +221,7 @@ public class GUIController {
                             Duration.seconds(reproductionTime.getValue() * mediaPlayer.getTotalDuration().toSeconds()));
                 }
             }
+            
         });
 
         mediaPlayer.currentTimeProperty().addListener((a, b, value) -> {
@@ -186,8 +229,17 @@ public class GUIController {
 
             double minutoActual = (int) value.toMinutes();
             double segundoActual = (int) value.toSeconds() % 60;
-            timeLabel
-                    .setText(String.format("%.0f", minutoActual) + "." + String.format("%.0f", segundoActual) + "Mins");
+            timeLabel.setText(String.format("%.0f", minutoActual) + "." + String.format("%.0f", segundoActual) + "Mins");
+            //System.out.println("ImageX: " + cuadrado.getTranslateX() + " ImageY: " + cuadrado.getTranslateY());
+        
+            double actualTime = Math.round(reproductionTime.getValue()*mediaPlayer.getTotalDuration().toSeconds() * 10d) / 10d;
+            ImagePosition actualPosition = getImagePosicion(actualTime); 
+            if(actualPosition != null){
+                System.out.println("conincidencia");
+                cuadrado.setTranslateX(actualPosition.getPosx());
+                cuadrado.setTranslateY(actualPosition.getPosy());
+            }
+            
         });
 
         mediaPlayer.setOnReady(() -> {
@@ -223,6 +275,8 @@ public class GUIController {
     void muteClick(MouseEvent event) {
         System.out.println("mute");
         navBarVolume.setValue(0);
+        
+        //FALTA RESTABLECER EL AUDIO
     }
 
     @FXML
@@ -270,10 +324,10 @@ public class GUIController {
 
         @Override
         public void handle(MouseEvent t) {
-            System.out.println("sotiene: " + t.getSceneX());
+            //System.out.println("sotiene: " + t.getSceneX());
             orgSceneX = t.getSceneX();
             orgSceneY = t.getSceneY();
-            System.out.println("orgSceneX :" + orgSceneX + " orgSceneY: " + orgSceneY);
+            //System.out.println("orgSceneX :" + orgSceneX + " orgSceneY: " + orgSceneY);
             orgTranslateX = ((Rectangle) (t.getSource())).getTranslateX();
             orgTranslateY = ((Rectangle) (t.getSource())).getTranslateY();
             ((Rectangle) (t.getSource())).setTranslateX(orgSceneX-400-40);
@@ -286,7 +340,19 @@ public class GUIController {
         @Override
         public void handle(MouseEvent t) 
         {
+            //System.out.println("SOLTE EL MOUSE");
+            if(mediaPlayer == null){
+                System.out.println("No hay video");
+            }
+            else{
+                //System.out.println("Tiempo: " + reproductionTime.getValue() + "X: " + cuadrado.getTranslateX() + "Y: " + cuadrado.getTranslateY());
+                double actualTime = Math.round(reproductionTime.getValue()*mediaPlayer.getTotalDuration().toSeconds() * 10d) / 10d;
+                ImagePosition newPosition = new ImagePosition(actualTime, cuadrado.getTranslateX(), cuadrado.getTranslateY());
+                addImagePosition(newPosition);
+            }
+            
             /*System.out.println("solto mause");
+            
             orgSceneX = t.getSceneX();
             orgSceneY = t.getSceneY();
             System.out.println("orgSceneX :" + orgSceneX + " orgSceneY: " + orgSceneY);
@@ -301,4 +367,11 @@ public class GUIController {
             ((Rectangle) (t.getSource())).setTranslateY(newTranslateY);*/
         }
     };
+    
+    public void setVideoTime(double percent){
+        if(mediaPlayer != null){
+            mediaPlayer.seek(Duration.seconds(mediaPlayer.getTotalDuration().toSeconds() * percent));
+            reproductionTime.setValue(percent);
+        }
+    }
 }
