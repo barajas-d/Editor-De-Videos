@@ -37,6 +37,7 @@ import java.util.List;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
@@ -70,6 +71,8 @@ public class GUIController {
     double orgSceneX, orgSceneY;
     double orgTranslateX, orgTranslateY;
     Rectangle cuadrado;
+    double muteVolumenOld;
+    boolean muted = false;
 
     List<ImagePosition> imagePosition = new ArrayList<>();
     
@@ -155,7 +158,7 @@ public class GUIController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Seleccionar Audio");
         fileChooser.getExtensionFilters()
-                .addAll(new FileChooser.ExtensionFilter("Sonido (*.mp3, *.aac, *.wav)", "*.mp3", "*.wav", "*.aac"));
+                .addAll(new FileChooser.ExtensionFilter("Sonido (*.mp3, *.wav)", "*.mp3", "*.aac"));
 
         String url = "";
         File file = fileChooser.showOpenDialog(null);
@@ -172,12 +175,28 @@ public class GUIController {
             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(file);
             sonido.open(audioInputStream);
             // mediaPlayer.setVolume(0);
+            
             mediaPlayer.setMute(true);
+            
+             navBarVolume.valueProperty().addListener(new InvalidationListener() {
+                public void invalidated(Observable ov) {
+                    System.out.println("Volumen Wav: " + navBarVolume.getValue());
+                }
+            });
+            
             sonido.start();
+            
         } else if (substring.equals("mp3")) {
             MP3Player mp3 = new MP3Player(file);
             // mediaPlayer.setVolume(0);
             mediaPlayer.setMute(true);
+            
+            navBarVolume.valueProperty().addListener(new InvalidationListener() {
+                public void invalidated(Observable ov) {
+                    System.out.println("Volumen MP3: " + navBarVolume.getValue());
+                }
+            });
+            
             mp3.play();
         }
 
@@ -195,7 +214,7 @@ public class GUIController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Seleccionar Vídeo");
         fileChooser.getExtensionFilters()
-                .addAll(new FileChooser.ExtensionFilter("Vídeo (*.mp4, *.mkv)", "*.mp4", "*.mkv"));
+                .addAll(new FileChooser.ExtensionFilter("Vídeo (*.mp4, *.mov)", "*.mp4", "*.mov"));
         String urlVideo = "";
         File file = fileChooser.showOpenDialog(null);
         if (file != null) {
@@ -273,10 +292,16 @@ public class GUIController {
 
     @FXML
     void muteClick(MouseEvent event) {
-        System.out.println("mute");
-        navBarVolume.setValue(0);
-        
-        //FALTA RESTABLECER EL AUDIO
+        System.out.println("mute");        
+        if(muted){
+            navBarVolume.setValue(muteVolumenOld);
+            muted = false;
+        }
+        else{
+            muteVolumenOld = navBarVolume.getValue();
+            navBarVolume.setValue(0);
+            muted = true;
+        }
     }
 
     @FXML
