@@ -66,25 +66,30 @@ public class GUIController {
     @FXML
     void addPicture(MouseEvent event) {
         reproductionTime.setValue(0.5);
-        
         System.out.println("subir imagen");
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Seleccionar Imagen");
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Imagen (*.png, *.jpg, *.gif)", "*.png", "*.jpg", "*.gif"));
-        
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Imagen (*.png, *.jpg, *.gif)", "*.png", "*.jpg", "*.gif"));
+        String url="";
 
-        String url = "";
         File file = fileChooser.showOpenDialog(null);
-        if (file != null) {
+
+        if(file!=null){
             System.out.println(file.getPath());
             url = "file://" + file.getPath();
-        } else return;
+        }
+        else return;
         
-        Image image = new Image(file.toURI().toString());
+        ImageView image = new ImageView(file.toURI().toString());
+        image.setFitHeight(600);
+        image.setFitWidth(800);
+        
         Label imagenLabel = new Label();
-        imagenLabel.setGraphic(new ImageView(image));
+
         imagenLabel.relocate(0, 0);
+
+        imagenLabel.setGraphic(image);
+
         mediaViewPane.getChildren().add(imagenLabel);
     }
 
@@ -140,15 +145,15 @@ public class GUIController {
         fileChooser.setTitle("Seleccionar Vídeo");
         fileChooser.getExtensionFilters()
                 .addAll(new FileChooser.ExtensionFilter("Vídeo (*.mp4, *.mkv)", "*.mp4", "*.mkv"));
-        String urlVideo = "";
+        String urlVideo="";
         File file = fileChooser.showOpenDialog(null);
         if (file != null) {
             String filePath=file.getPath().replace("\\", "/");
-            urlVideo = "file:///" + filePath;
+            urlVideo = new String("file:///" + filePath);
             //urlVideo = "file:///C:/videoTest.mp4";
             System.out.println("subir video " + urlVideo);
         } else {
-            System.out.println(urlVideo);
+            System.out.println("Error URL Video");
         }
         media = new Media(urlVideo);
         mediaPlayer = new MediaPlayer(media);
