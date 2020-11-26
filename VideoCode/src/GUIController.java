@@ -305,7 +305,7 @@ public class GUIController {
             System.out.println("NO HA CARGADO VIDEO");
         else{
             System.out.println("YA CARGO VIDEO");
-            urlFinal="D:\\VideoFinal.mp4";
+            urlFinal="VideoFinal.mp4";
             System.out.println(urlFinal);
             Video v;
             if(urlAudio.isEmpty())

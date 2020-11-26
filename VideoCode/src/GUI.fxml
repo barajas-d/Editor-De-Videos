@@ -101,7 +101,7 @@
                   <Font size="39.0" />
                </font>
             </Text>
-            <Button id="btnAdelantar" layoutX="878.0" layoutY="696.0" mnemonicParsing="false" onMouseClicked="#muteClick" prefHeight="51.0" prefWidth="57.0" style="-fx-background-color: transparent;" textFill="TRANSPARENT">
+            <Button id="btnAdelantar" layoutX="878.0" layoutY="696.0" mnemonicParsing="false" onMouseClicked="#saveVideo" prefHeight="51.0" prefWidth="57.0" style="-fx-background-color: transparent;" textFill="TRANSPARENT">
                <graphic>
                   <ImageView id="saveVideo" fitHeight="31.0" fitWidth="35.0" onMouseClicked="#saveVideo">
                      <image>
